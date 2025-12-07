@@ -37,42 +37,44 @@ export class LLMService {
     }
 
     static async parseSearchQuery(userInput) {
-        const currentTimestamp = new Date().toISOString();
-        const prompt = `
-      You are a helpful assistant for a personal logging app.
-      The user will ask a question to search their logs.
-      Your task is to extract search parameters: "keywords" (for text search) and "dateRange" (start and end timestamps).
-      
-      Current Time: ${currentTimestamp}
-      
-      Rules:
-      1. "keywords": Extract the main topic or action to search for. If the user asks "what did I do...", keywords might be empty or generic.
-      2. "dateRange": Calculate start and end timestamps in ISO 8601 format (UTC) if the user specifies a time range (e.g., "yesterday", "last week"). If no time is specified, return null for dateRange.
-      3. Return ONLY a valid JSON object. Do not include markdown formatting.
-      
-      Example Input: "When did I run?"
-      Example Output: { "keywords": "run", "dateRange": null }
-      
-      Example Input: "What did I eat yesterday?" (Assuming Current Time is 2023-10-27T12:00:00Z)
-      Example Output: { "keywords": "eat", "dateRange": { "start": "2023-10-26T00:00:00.000Z", "end": "2023-10-26T23:59:59.999Z" } }
-      
-      User Input: "${userInput}"
-    `;
-
         try {
+            // 1. Fetch all events (Context)
+            const allEvents = await DatabaseService.getAllEvents();
+
+            // 2. Prepare context for LLM
+            const currentTimestamp = new Date().toISOString();
+            const eventsContext = JSON.stringify(allEvents, null, 2);
+
+            const prompt = `
+            You are a smart Personal Log Assistant.
+            
+            Current Time: ${currentTimestamp}
+            User Query: "${userInput}"
+            
+            Here is the full log of events:
+            ${eventsContext}
+            
+            Task:
+            1. Search the logs for any events relevant to the User Query.
+            2. Match events regardless of tense (e.g., "make tea" matches "made tea") or slight phrasing differences.
+            3. Return ONLY a valid JSON array of the matching event objects from the list above. 
+            4. If no events match, return an empty array [].
+            5. Do NOT include markdown formatting.
+            `;
+
+            // 3. Call LLM
             const response = await axios.post(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
                 contents: [{ parts: [{ text: prompt }] }]
             });
 
             const text = response.data.candidates[0].content.parts[0].text;
             const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            const { keywords, dateRange } = JSON.parse(cleanText);
 
-            return await DatabaseService.searchEvents(
-                keywords,
-                dateRange?.start,
-                dateRange?.end
-            );
+            // 4. Return results directly (already correct structure)
+            const matchedEvents = JSON.parse(cleanText);
+
+            return matchedEvents;
+
         } catch (error) {
             console.error('LLM Search Error:', error);
             throw error;
