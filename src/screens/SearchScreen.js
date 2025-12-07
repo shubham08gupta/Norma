@@ -5,7 +5,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DatabaseService } from '../services/DatabaseService';
 import { LLMService } from '../services/LLMService';
 
+import { useTheme } from '../context/ThemeContext';
+
 export default function SearchScreen() {
+    const { theme } = useTheme();
+    const { colors } = theme;
+
     const [input, setInput] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -28,11 +33,12 @@ export default function SearchScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.searchHeader}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.searchHeader, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     placeholder="Ask a question..."
+                    placeholderTextColor={colors.subText}
                     value={input}
                     onChangeText={setInput}
                     onSubmitEditing={handleSearch}
@@ -40,10 +46,10 @@ export default function SearchScreen() {
                     editable={!loading}
                 />
                 {loading ? (
-                    <ActivityIndicator style={styles.loader} />
+                    <ActivityIndicator style={styles.loader} color={colors.primary} />
                 ) : (
                     <TouchableOpacity onPress={handleSearch} style={styles.sendButton}>
-                        <Ionicons name="search" size={24} color="#007AFF" />
+                        <Ionicons name="search" size={24} color={colors.primary} />
                     </TouchableOpacity>
                 )}
             </View>
@@ -52,14 +58,14 @@ export default function SearchScreen() {
                 data={results}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <View style={styles.resultItem}>
-                        <Text style={styles.resultText}>{item.event_text}</Text>
-                        <Text style={styles.resultTime}>{new Date(item.timestamp).toLocaleString()}</Text>
+                    <View style={[styles.resultItem, { backgroundColor: colors.card }]}>
+                        <Text style={[styles.resultText, { color: colors.text }]}>{item.event_text}</Text>
+                        <Text style={[styles.resultTime, { color: colors.subText }]}>{new Date(item.timestamp).toLocaleString()}</Text>
                     </View>
                 )}
                 contentContainerStyle={styles.listContent}
                 ListEmptyComponent={
-                    !loading && <Text style={styles.emptyText}>No results found</Text>
+                    !loading && <Text style={[styles.emptyText, { color: colors.subText }]}>No results found</Text>
                 }
             />
         </SafeAreaView>
@@ -69,20 +75,16 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     searchHeader: {
         padding: 16,
-        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
         flexDirection: 'row',
         alignItems: 'center',
     },
     input: {
         flex: 1,
         height: 50,
-        backgroundColor: '#f0f0f0',
         borderRadius: 25,
         paddingHorizontal: 20,
         fontSize: 16,
@@ -98,7 +100,6 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     resultItem: {
-        backgroundColor: 'white',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
@@ -110,17 +111,14 @@ const styles = StyleSheet.create({
     },
     resultText: {
         fontSize: 16,
-        color: '#333',
         marginBottom: 4,
     },
     resultTime: {
         fontSize: 12,
-        color: '#888',
     },
     emptyText: {
         textAlign: 'center',
         marginTop: 40,
-        color: '#888',
         fontSize: 16,
     },
 });

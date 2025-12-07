@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { DatabaseService } from './src/services/DatabaseService';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 export default function App() {
   const [dbReady, setDbReady] = useState(false);
@@ -40,5 +41,9 @@ export default function App() {
     );
   }
 
-  return <AppNavigator />;
+  return (
+    <ThemeProvider>
+      <AppNavigator />
+    </ThemeProvider>
+  );
 }

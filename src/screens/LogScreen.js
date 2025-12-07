@@ -5,7 +5,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DatabaseService } from '../services/DatabaseService';
 import { LLMService } from '../services/LLMService';
 
+import { useTheme } from '../context/ThemeContext';
+
 export default function LogScreen() {
+    const { theme } = useTheme();
+    const { colors } = theme;
+
     const [input, setInput] = useState('');
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -43,11 +48,12 @@ export default function LogScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.inputContainer}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.inputContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     placeholder="Log something..."
+                    placeholderTextColor={colors.subText}
                     value={input}
                     onChangeText={setInput}
                     onSubmitEditing={handleSend}
@@ -55,10 +61,10 @@ export default function LogScreen() {
                     editable={!loading}
                 />
                 {loading ? (
-                    <ActivityIndicator style={styles.loader} />
+                    <ActivityIndicator style={styles.loader} color={colors.primary} />
                 ) : (
                     <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-                        <Ionicons name="send" size={24} color="#007AFF" />
+                        <Ionicons name="send" size={24} color={colors.primary} />
                     </TouchableOpacity>
                 )}
             </View>
@@ -68,9 +74,9 @@ export default function LogScreen() {
                     data={logs}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <View style={styles.logItem}>
-                            <Text style={styles.logText}>{item.event_text}</Text>
-                            <Text style={styles.logTime}>{new Date(item.timestamp).toLocaleString()}</Text>
+                        <View style={[styles.logItem, { backgroundColor: colors.card }]}>
+                            <Text style={[styles.logText, { color: colors.text }]}>{item.event_text}</Text>
+                            <Text style={[styles.logTime, { color: colors.subText }]}>{new Date(item.timestamp).toLocaleString()}</Text>
                         </View>
                     )}
                     contentContainerStyle={styles.listContent}
@@ -83,7 +89,6 @@ export default function LogScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     content: {
         flex: 1,
@@ -93,7 +98,6 @@ const styles = StyleSheet.create({
         paddingBottom: 80,
     },
     logItem: {
-        backgroundColor: 'white',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
@@ -105,25 +109,20 @@ const styles = StyleSheet.create({
     },
     logText: {
         fontSize: 16,
-        color: '#333',
         marginBottom: 4,
     },
     logTime: {
         fontSize: 12,
-        color: '#888',
     },
     inputContainer: {
         padding: 16,
-        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
         flexDirection: 'row',
         alignItems: 'center',
     },
     input: {
         flex: 1,
         height: 50,
-        backgroundColor: '#f0f0f0',
         borderRadius: 25,
         paddingHorizontal: 20,
         fontSize: 16,
