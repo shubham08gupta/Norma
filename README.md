@@ -4,9 +4,10 @@ Norma is an intelligent personal logging application built with React Native and
 
 ## 🚀 Features
 
--   **Natural Language Logging**: simply type what you did (e.g., "I drank coffee at 10 AM"), and the app uses Gemini AI to extract the event and timestamp automatically.
--   **Smart Search**: Ask questions about your logs (e.g., "When was the last time I ran?"), and the app understands your intent to find the relevant records.
--   **Local Storage**: All data is securely stored on your device using SQLite.
+-   **Natural Language Logging**: Simply type what you did (e.g., "I drank coffee at 10 AM"), and the app uses Gemini AI to extract the event and timestamp automatically.
+-   **Semantic Search**: An advanced search engine powered by LLM context. It understands synonyms and tense variations (e.g., searching "When did I run?" finds "I went for a jog" or "I ran yesterday") by filtering your entire log history intelligently.
+-   **Dark Mode Support**: Fully customizable appearance with **Light**, **Dark**, and **Auto** modes. The Auto mode respects your device's system settings.
+-   **Local Storage**: All event data is securely stored on your device using SQLite. Settings are persisted using AsyncStorage.
 -   **Optimized Performance**: Uses `gemini-2.5-flash-lite` for fast and cost-effective AI operations.
 -   **Unit Tested**: Critical services are covered by Jest unit tests.
 
@@ -14,9 +15,9 @@ Norma is an intelligent personal logging application built with React Native and
 
 -   **Framework**: [React Native](https://reactnative.dev/) with [Expo](https://expo.dev/)
 -   **AI Model**: Google Gemini (`gemini-2.5-flash-lite`)
--   **Database**: SQLite (`expo-sqlite`)
+-   **Database**: SQLite (`expo-sqlite`) for logs, AsyncStorage for settings
 -   **HTTP Client**: Axios
--   **Navigation**: React Navigation
+-   **Navigation**: React Navigation (Bottom Tabs)
 -   **Testing**: Jest & Jest Expo
 
 ## 📱 Prerequisites
